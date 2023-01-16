@@ -45,7 +45,7 @@
                 $("#fill").html(divs);
             }
 
-        })
+        });
         $(document).on("click", "#srch", function() {
             $("#fill").html('');
             var search = $("#search_news").val();
