@@ -11,6 +11,7 @@
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="css/styles.css" rel="stylesheet" />
+    <link href="css/loader_style.css" rel="stylesheet" />
     <script src="js/jquery.js"></script>
 </head>
 
@@ -24,56 +25,92 @@
             url: "action.php",
             type: "POST",
             data: obj,
+            beforeSend: function() {
+                $("#fill").html(`
+                        <div class="col text-center my-5 py-5">
+                            <div class="spinner-grow text-danger " role="status">
+                                <span class="sr-only"></span>
+                            </div>
+                        </div>
+                        `);
+            },
             success: function(data) {
-
                 var articles = data.articles;
                 var divs = "";
                 articles.forEach((article) => {
                     divs += `
-                        <div class="card mb-4">
-                    <a href="#!"><img class="card-img-top" src="${article.urlToImage
-}" alt="..." /></a>
-                    <div class="card-body">
-                        <div class="small text-muted">${article.publishedAt}</div>
-                        <h2 class="card-title">${article.title}</h2>
-                        <p class="card-text">Author : ${article.source.name}</p>
-                        <p class="card-text">${article.description}</p>
-                        <a class="btn btn-primary" href="${article.url}" id="readmore">Read more →</a>
-                    </div>
-                </div>`
+                                <div class="card mb-4">
+                            <a href="#!"><img class="card-img-top" src="${article.urlToImage
+        }" alt="..." /></a>
+                            <div class="card-body">
+                                <div class="small text-muted">${article.publishedAt}</div>
+                                <h2 class="card-title">${article.title}</h2>
+                                <p class="card-text">Author : ${article.source.name}</p>
+                                <p class="card-text">${article.description}</p>
+                                <a class="btn btn-primary" href="${article.url}" id="readmore">Read more →</a>
+                            </div>
+                        </div>`
                 });
+
                 $("#fill").html(divs);
+
+            },
+            complete: function(data) {
+
             }
 
-        });
+        })
         $(document).on("click", "#srch", function() {
             $("#fill").html('');
             var search = $("#search_news").val();
             var jsn = JSON.stringify({
                 'q': search
             });
+
+            var btn = this;
+            var btn_text = $(btn).text();
+
             $.ajax({
                 url: "action.php",
                 type: "POST",
                 data: jsn,
+                beforeSend: function() {
+                    $(btn).text('searching');
+                    $("#fill").html(`
+                        <div class="col text-center my-5 py-5">
+                            <div class="spinner-grow text-danger " role="status">
+                                <span class="sr-only"></span>
+                            </div>
+                        </div>
+                        `);
+                },
                 success: function(data) {
-                    $("#headline").text(`Your searches for "${search}"`)
-                    var articles = data.articles;
-                    var divs = "";
-                    articles.forEach((article) => {
-                        divs += `
+                    $(btn).text(btn_text);
+                    if (data.status != 'error') {
+                        $("#headline").text(`Your searches for "${search}"`)
+                        var articles = data.articles;
+                        var divs = "";
+                        if (articles.length > 0) {
+                            articles.forEach((article) => {
+                                divs += `
                         <div class="card mb-4">
-                    <a href="#!"><img class="card-img-top" src="${article.urlToImage
-}" alt="assets/image(2).jpg" /></a>
-                    <div class="card-body">
-                        <div class="small text-muted">${article.publishedAt}</div>
-                        <h2 class="card-title">${article.title}</h2>
-                        <p class="card-text">Author : ${article.source.name}</p>
-                        <p class="card-text">${article.description}</p>
-                        <a class="btn btn-primary" href="${article.url}" id="readmore">Read more →</a>
-                    </div>
-                </div>`
-                    });
+                            <a href="#!"><img class="card-img-top" src="${article.urlToImage}" alt="assets/image(2).jpg" /></a>
+                            <div class="card-body">
+                                <div class="small text-muted">${article.publishedAt}</div>
+                                <h2 class="card-title">${article.title}</h2>
+                                <p class="card-text">Author : ${article.source.name}</p>
+                                <p class="card-text">${article.description}</p>
+                                <a class="btn btn-primary" href="${article.url}" id="readmore">Read more →</a>
+                            </div>
+                        </div>`;
+                            });
+                        } else {
+                            divs += `<div class="text-danger text-center"><h1>Your search did not match any artical</h1></div>`;
+                        }
+                    } else {
+                        console.log("sdsadfs");
+                        // divs += `<div class="text-danger">${article}</div>`;
+                    }
                     // console.log(divs);
                     $("#fill").html(divs);
                 }
@@ -117,8 +154,12 @@
             <div class="col-lg-8">
                 <h3 id="headline">Top news of the day: Pakistan</h3>
                 <!-- Featured blog post-->
-                <div id="fill">
-
+                <div class="row" id="fill">
+                    <div class="col text-center my-5 py-5">
+                        <div class="spinner-grow text-danger " role="status">
+                            <span class="sr-only"></span>
+                        </div>
+                    </div>
                 </div>
 
             </div>
