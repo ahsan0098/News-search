@@ -109,7 +109,7 @@
                         }
                     } else {
                         console.log("sdsadfs");
-                        // divs += `<div class="text-danger">${article}</div>`;
+                        // divs += `<div class="text-danger">${article.errorclear}</div>`;
                     }
                     // console.log(divs);
                     $("#fill").html(divs);
